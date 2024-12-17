@@ -82,24 +82,19 @@ export class TwitterPostClient {
             );
 
             const lastPostTimestamp = lastPost?.timestamp ?? 0;
-            const minMinutes =
-                parseInt(this.runtime.getSetting("POST_INTERVAL_MIN")) || 90;
-            const maxMinutes =
-                parseInt(this.runtime.getSetting("POST_INTERVAL_MAX")) || 180;
-            const randomMinutes =
-                Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) +
-                minMinutes;
-            const delay = randomMinutes * 60 * 1000;
+            const fixedInterval = 5 * 60 * 1000;  // 5 minutes in milliseconds
 
-            if (Date.now() > lastPostTimestamp + delay) {
+            // Check if enough time has passed since the last post
+            if (Date.now() > lastPostTimestamp + fixedInterval) {
                 await this.generateNewTweet();
             }
 
+            // Set up next iteration with a fixed delay of 5 minutes
             setTimeout(() => {
-                generateNewTweetLoop(); // Set up next iteration
-            }, delay);
+                generateNewTweetLoop();
+            }, fixedInterval);
 
-            elizaLogger.log(`Next tweet scheduled in ${randomMinutes} minutes`);
+            elizaLogger.log(`Next tweet scheduled in 5 minutes`);
         };
         if (
             this.runtime.getSetting("POST_IMMEDIATELY") != null &&
